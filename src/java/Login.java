@@ -13,22 +13,26 @@ public class Login extends HttpServlet {
     private static final String VALID_PASSWORD = "123";
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+protected void doPost(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
 
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
+    String username = request.getParameter("username");
+    String password = request.getParameter("password");
 
-        response.setContentType("text/html");
-        PrintWriter out = response.getWriter();
+    response.setContentType("text/html");
+    PrintWriter out = response.getWriter();
 
-        if (VALID_USERNAME.equals(username) && VALID_PASSWORD.equals(password)) {
-            response.sendRedirect("home.jsp");  // ✅ Redirect to dashboard
-        } else {
-            out.println("<html><head><title>Login Failed</title></head><body>");
-            out.println("<h2 style='color:red;'>❌ Invalid username or password.</h2>");
-            out.println("<a href='login.jsp'>🔁 Try Again</a>");
-            out.println("</body></html>");
-        }
+    if (VALID_USERNAME.equals(username) && VALID_PASSWORD.equals(password)) {
+        // ✅ Store username in session so home.jsp can detect login
+        request.getSession().setAttribute("username", username);
+
+        // ✅ Redirect to home.jsp
+        response.sendRedirect("home.jsp");
+    } else {
+        out.println("<html><head><title>Login Failed</title></head><body>");
+        out.println("<h2 style='color:red;'>❌ Invalid username or password.</h2>");
+        out.println("<a href='login.jsp'>🔁 Try Again</a>");
+        out.println("</body></html>");
     }
+}
 }

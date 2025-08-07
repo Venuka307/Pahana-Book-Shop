@@ -27,27 +27,28 @@ public class AddCustomer extends HttpServlet {
         String name = request.getParameter("name").trim();
         String address = request.getParameter("address").trim();
         String telephone = request.getParameter("telephone").trim();
-
-        // 🟡 Debug log
+        String email = request.getParameter("email").trim();
+        
         System.out.println("🚀 Received from form:");
         System.out.println("Account Number: " + accountNumber);
         System.out.println("Name: " + name);
         System.out.println("Address: " + address);
         System.out.println("Telephone: " + telephone);
+        System.out.println("Email: " + email);
 
-        if (accountNumber.isEmpty() || name.isEmpty() || address.isEmpty() || telephone.isEmpty()) {
+
+        if (accountNumber.isEmpty() || name.isEmpty() || address.isEmpty() || telephone.isEmpty() || email.isEmpty()) {
             request.setAttribute("message", "❌ All fields are required.");
             request.setAttribute("msgType", "error");
             request.getRequestDispatcher("addCustomer.jsp").forward(request, response);
             return;
         }
 
-        Customer customer = new Customer(accountNumber, name, address, telephone);
+        Customer customer = new Customer(accountNumber, name, address, telephone, email);
 
         boolean success = customerDAO.addCustomer(customer);
-
-        // ✅ Log result
-        System.out.println("✅ DAO returned: " + success);
+        
+        System.out.println("✅ DAO returned: " + success); 
 
         if (success) {
             request.setAttribute("message", "✅ Customer added successfully!");

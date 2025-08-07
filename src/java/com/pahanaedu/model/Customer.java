@@ -5,15 +5,20 @@ public class Customer {
     private String name;
     private String address;
     private String telephone;
+    private String email;  // <-- new field
 
     public Customer() {}
 
-    public Customer(String accountNumber, String name, String address, String telephone) {
+    // Updated constructor including email
+    public Customer(String accountNumber, String name, String address, String telephone, String email) {
         this.accountNumber = accountNumber;
         this.name = name;
         this.address = address;
         this.telephone = telephone;
+        this.email = email;
     }
+
+    // getters and setters
 
     public String getAccountNumber() {
         return accountNumber;
@@ -45,5 +50,13 @@ public class Customer {
 
     public void setTelephone(String telephone) {
         this.telephone = telephone;
+    }
+
+    public String getEmail() {    // new getter
+        return email;
+    }
+
+    public void setEmail(String email) {  // new setter
+        this.email = email;
     }
 }

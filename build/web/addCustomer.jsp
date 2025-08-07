@@ -1,10 +1,11 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" session="true" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %> <!-- JSTL used for safer variable access -->
+<%@ page import="com.pahanaedu.model.Customer" %>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Add Customer - Pahana Edu</title>
+    <title><%= (request.getAttribute("editCustomer") != null) ? "Edit" : "Add" %> Customer - Pahana Edu</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
     <style>
         body {
@@ -37,14 +38,14 @@
             margin-bottom: 6px;
             color: #34495e;
         }
-        input[type=text], input[type=tel] {
+        input[type=text], input[type=tel], input[type=email] {
             padding: 10px 12px;
             border: 1.8px solid #bdc3c7;
             border-radius: 6px;
             font-size: 16px;
             transition: border-color 0.3s ease;
         }
-        input[type=text]:focus, input[type=tel]:focus {
+        input[type=text]:focus, input[type=tel]:focus, input[type=email]:focus {
             border-color: #2980b9;
             outline: none;
         }
@@ -62,6 +63,20 @@
         button:hover {
             background-color: #1c5980;
         }
+        .back-button {
+            background-color: #95a5a6;
+            margin-top: 10px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            border-radius: 6px;
+            padding: 12px 0;
+            color: white;
+        }
+        .back-button:hover {
+            background-color: #7f8c8d;
+        }
         .message {
             text-align: center;
             padding: 12px;
@@ -77,33 +92,67 @@
             color: #a94442;
         }
     </style>
+    <script>
+        // This calls the showCustomerTable function in the outer page (customer.jsp)
+        function showCustomerTable() {
+            if (window.parent && typeof window.parent.showCustomerTable === 'function') {
+                window.parent.showCustomerTable();
+            }
+        }
+    </script>
 </head>
 <body>
 
-<div class="container">
-    <h1>➕ Add New Customer</h1>
+<%
+    Customer editCustomer = (Customer) request.getAttribute("editCustomer");
+    boolean isEditing = (editCustomer != null);
+%>
 
-    <form action="${pageContext.request.contextPath}/AddCustomer" method="post">
+<div class="container">
+    <h1><%= isEditing ? "✏️ Edit Customer" : "➕ Add New Customer" %></h1>
+
+    <form action="<%= isEditing ? "UpdateCustomer" : "AddCustomer" %>" method="post">
         <label for="accountNumber">Account Number</label>
-        <input type="text" id="accountNumber" name="accountNumber" placeholder="e.g. ACC123" required />
+        <input type="text" id="accountNumber" name="accountNumber" 
+               value="<%= isEditing ? editCustomer.getAccountNumber() : "" %>" 
+               placeholder="e.g. ACC123" 
+               <%= isEditing ? "readonly" : "required" %> />
 
         <label for="name">Customer Name</label>
-        <input type="text" id="name" name="name" placeholder="Full Name" required />
+        <input type="text" id="name" name="name" 
+               value="<%= isEditing ? editCustomer.getName() : "" %>" 
+               placeholder="Full Name" required />
 
         <label for="address">Address</label>
-        <input type="text" id="address" name="address" placeholder="Address" required />
+        <input type="text" id="address" name="address" 
+               value="<%= isEditing ? editCustomer.getAddress() : "" %>" 
+               placeholder="Address" required />
 
         <label for="telephone">Telephone Number</label>
-        <input type="tel" id="telephone" name="telephone" placeholder="+94XXXXXXXXX" required />
+        <input type="tel" id="telephone" name="telephone" 
+               value="<%= isEditing ? editCustomer.getTelephone() : "" %>" 
+               placeholder="+94XXXXXXXXX" required />
 
-        <button type="submit">Add Customer</button>
+        <label for="email">Email Address</label>
+        <input type="email" id="email" name="email" 
+               value="<%= isEditing ? editCustomer.getEmail() : "" %>" 
+               placeholder="email@example.com" required />
+
+        <button type="submit"><%= isEditing ? "Update Customer" : "Add Customer" %></button>
+        <button type="button" class="back-button" onclick="showCustomerTable()">⬅ Back to List</button>
     </form>
 
-    <c:if test="${not empty message}">
-        <div class="message ${msgType}">
-            ${message}
+    <%
+        String message = (String) request.getAttribute("message");
+        String msgType = (String) request.getAttribute("msgType"); 
+        if (message != null && !message.trim().isEmpty()) {
+    %>
+        <div class="message <%= msgType != null ? msgType : "" %>">
+            <%= message %>
         </div>
-    </c:if>
+    <%
+        }
+    %>
 </div>
 
 </body>
