@@ -23,7 +23,7 @@ public class EditCustomer extends HttpServlet {
         String accountNumber = request.getParameter("accountNumber");
 
         if (accountNumber == null || accountNumber.trim().isEmpty()) {
-            response.sendRedirect("customer.jsp");  // Redirect back if no account number
+            response.sendRedirect("customer.jsp");  
             return;
         }
 
@@ -35,10 +35,10 @@ public class EditCustomer extends HttpServlet {
             return;
         }
 
-        // Put the customer object in request scope for editing
+        
         request.setAttribute("editCustomer", customer);
 
-        // Forward to addCustomer.jsp to show form with pre-filled data
+        
         request.getRequestDispatcher("addCustomer.jsp").forward(request, response);
     }
 }

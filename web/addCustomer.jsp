@@ -1,15 +1,20 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" session="true" %>
 <%@ page import="com.pahanaedu.model.Customer" %>
 
+<%
+    Customer editCustomer = (Customer) request.getAttribute("editCustomer");
+    boolean isEditing = (editCustomer != null);
+%>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title><%= (request.getAttribute("editCustomer") != null) ? "Edit" : "Add" %> Customer - Pahana Edu</title>
+    <title><%= isEditing ? "Edit" : "Add" %> Customer - Pahana Edu</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
     <style>
         body {
-            margin: 0; 
+            margin: 0;
             font-family: 'Poppins', sans-serif;
             background: #f5f7fa;
             color: #333;
@@ -93,49 +98,44 @@
         }
     </style>
     <script>
-        // This calls the showCustomerTable function in the outer page (customer.jsp)
         function showCustomerTable() {
-            if (window.parent && typeof window.parent.showCustomerTable === 'function') {
-                window.parent.showCustomerTable();
-            }
-        }
+    parent.showCustomerTable();
+}
+
     </script>
 </head>
 <body>
 
-<%
-    Customer editCustomer = (Customer) request.getAttribute("editCustomer");
-    boolean isEditing = (editCustomer != null);
-%>
-
 <div class="container">
     <h1><%= isEditing ? "✏️ Edit Customer" : "➕ Add New Customer" %></h1>
 
-    <form action="<%= isEditing ? "UpdateCustomer" : "AddCustomer" %>" method="post">
+    <form action="<%= request.getContextPath() + (isEditing ? "/UpdateCustomer" : "/AddCustomer") %>" method="post">
+
+
         <label for="accountNumber">Account Number</label>
-        <input type="text" id="accountNumber" name="accountNumber" 
-               value="<%= isEditing ? editCustomer.getAccountNumber() : "" %>" 
-               placeholder="e.g. ACC123" 
+        <input type="text" id="accountNumber" name="accountNumber"
+               value="<%= isEditing ? editCustomer.getAccountNumber() : "" %>"
+               placeholder="e.g. ACC123"
                <%= isEditing ? "readonly" : "required" %> />
 
         <label for="name">Customer Name</label>
-        <input type="text" id="name" name="name" 
-               value="<%= isEditing ? editCustomer.getName() : "" %>" 
+        <input type="text" id="name" name="name"
+               value="<%= isEditing ? editCustomer.getName() : "" %>"
                placeholder="Full Name" required />
 
         <label for="address">Address</label>
-        <input type="text" id="address" name="address" 
-               value="<%= isEditing ? editCustomer.getAddress() : "" %>" 
+        <input type="text" id="address" name="address"
+               value="<%= isEditing ? editCustomer.getAddress() : "" %>"
                placeholder="Address" required />
 
         <label for="telephone">Telephone Number</label>
-        <input type="tel" id="telephone" name="telephone" 
-               value="<%= isEditing ? editCustomer.getTelephone() : "" %>" 
+        <input type="tel" id="telephone" name="telephone"
+               value="<%= isEditing ? editCustomer.getTelephone() : "" %>"
                placeholder="+94XXXXXXXXX" required />
 
         <label for="email">Email Address</label>
-        <input type="email" id="email" name="email" 
-               value="<%= isEditing ? editCustomer.getEmail() : "" %>" 
+        <input type="email" id="email" name="email"
+               value="<%= isEditing ? editCustomer.getEmail() : "" %>"
                placeholder="email@example.com" required />
 
         <button type="submit"><%= isEditing ? "Update Customer" : "Add Customer" %></button>
@@ -144,7 +144,7 @@
 
     <%
         String message = (String) request.getAttribute("message");
-        String msgType = (String) request.getAttribute("msgType"); 
+        String msgType = (String) request.getAttribute("msgType");
         if (message != null && !message.trim().isEmpty()) {
     %>
         <div class="message <%= msgType != null ? msgType : "" %>">
@@ -157,3 +157,7 @@
 
 </body>
 </html>
+
+
+
+

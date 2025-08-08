@@ -150,4 +150,39 @@ public class CustomerDAO {
             return false;
         }
     }
+    
+    // New method for searching customers by keyword (account number, name, or email)
+    public List<Customer> searchCustomers(String keyword) {
+        List<Customer> customers = new ArrayList<>();
+        String sql = "SELECT * FROM customers WHERE account_number LIKE ? OR name LIKE ? OR email LIKE ?";
+        try {
+            Connection con = DBConnection.getInstance().getConnection();
+            if (con == null) {
+                System.out.println("❌ Connection is null! Check DBConnection.java.");
+                return customers;
+            }
+
+            PreparedStatement ps = con.prepareStatement(sql);
+            String searchPattern = "%" + keyword + "%";
+            ps.setString(1, searchPattern);
+            ps.setString(2, searchPattern);
+            ps.setString(3, searchPattern);
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Customer customer = new Customer(
+                    rs.getString("account_number"),
+                    rs.getString("name"),
+                    rs.getString("address"),
+                    rs.getString("telephone"),
+                    rs.getString("email")
+                );
+                customers.add(customer);
+            }
+        } catch (SQLException e) {
+            System.out.println("❌ Error searching customers: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return customers;
+    }
 }
