@@ -1,75 +1,63 @@
 package com.pahanaedu.servlet;
 
+import com.pahanaedu.dao.DAOFactory;
+import com.pahanaedu.dao.UserDAO;
+
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
-import java.io.*;
+import java.io.IOException;
 
 @WebServlet("/AddUser")
 public class AddUser extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
-    // File to store users (inside WEB-INF)
-    private static final String USER_FILE = "/WEB-INF/users.txt";
-
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        System.out.println("AddUser Servlet doPost() called"); 
+        
         String username = request.getParameter("username").trim();
         String password = request.getParameter("password").trim();
         String role = request.getParameter("role");
 
+    
+        System.out.println("Received add user request:");
+        System.out.println("Username: " + username);
+        System.out.println("Password: " + password);
+        System.out.println("Role: " + role);
+
         // Basic validation
         if(username.isEmpty() || password.isEmpty() || role == null || role.isEmpty()) {
+            System.out.println("Validation failed: some fields are empty");
             request.setAttribute("message", "All fields are required!");
             request.setAttribute("msgType", "error");
             request.getRequestDispatcher("addUser.jsp").forward(request, response);
             return;
         }
 
-        // Check if username already exists
-        if(isUsernameExists(username, request)) {
+        UserDAO userDAO = DAOFactory.getUserDAO();
+
+        // Check if username exists in DB
+        boolean exists = userDAO.isUsernameExists(username);
+        System.out.println("Does username exist? " + exists);
+        if(exists) {
             request.setAttribute("message", "Username already taken. Please choose another.");
             request.setAttribute("msgType", "error");
             request.getRequestDispatcher("addUser.jsp").forward(request, response);
             return;
         }
 
-        // Save user data to file - format: username,password,role
-        // Note: Password stored as plain text here, not recommended for production
-        String userLine = username + "," + password + "," + role + System.lineSeparator();
+        // Add user to DB
+        boolean added = userDAO.addUser(username, password, role);
+        System.out.println("User added? " + added);
 
-        String filePath = getServletContext().getRealPath(USER_FILE);
-        synchronized(this) {
-            try (FileWriter fw = new FileWriter(filePath, true);
-                 BufferedWriter bw = new BufferedWriter(fw)) {
-                bw.write(userLine);
-            } catch (IOException e) {
-                e.printStackTrace();
-                request.setAttribute("message", "Error saving user. Please try again.");
-                request.setAttribute("msgType", "error");
-                request.getRequestDispatcher("addUser.jsp").forward(request, response);
-                return;
-            }
+        if(added) {
+            request.setAttribute("message", "User added successfully!");
+            request.setAttribute("msgType", "success");
+        } else {
+            request.setAttribute("message", "Error adding user. Please try again.");
+            request.setAttribute("msgType", "error");
         }
 
-        request.setAttribute("message", "User added successfully!");
-        request.setAttribute("msgType", "success");
         request.getRequestDispatcher("addUser.jsp").forward(request, response);
-    }
-
-    private boolean isUsernameExists(String username, HttpServletRequest request) throws IOException {
-        String filePath = getServletContext().getRealPath(USER_FILE);
-        File file = new File(filePath);
-        if(!file.exists()) return false;
-
-        try(BufferedReader br = new BufferedReader(new FileReader(file))) {
-            String line;
-            while((line = br.readLine()) != null) {
-                String[] parts = line.split(",");
-                if(parts.length > 0 && parts[0].equalsIgnoreCase(username)) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 }

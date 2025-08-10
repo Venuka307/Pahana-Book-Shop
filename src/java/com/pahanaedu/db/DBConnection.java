@@ -10,7 +10,7 @@ public class DBConnection {
 
     private final String url = "jdbc:mysql://localhost:3306/pahanaedu_db";
     private final String user = "root";
-    private final String password = ""; // Add your password if needed
+    private final String password = ""; 
 
     private DBConnection() {
         try {

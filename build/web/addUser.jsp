@@ -80,12 +80,13 @@
 
 <div class="container">
     <h1>👤 Add New User</h1>
-    <form action="AddUser" method="post">
+    <form action="${pageContext.request.contextPath}/AddUser" method="post">
+
         <label for="username">Username</label>
         <input type="text" id="username" name="username" placeholder="Enter username" required pattern="[A-Za-z0-9_]{4,20}" title="4 to 20 characters, letters, numbers or underscore">
 
         <label for="password">Password</label>
-        <input type="password" id="password" name="password" placeholder="Enter password" required minlength="6" />
+        <input type="password" id="password" name="password" placeholder="Enter password" required minlength="4" />
 
         <label for="role">Role</label>
         <select id="role" name="role" required>

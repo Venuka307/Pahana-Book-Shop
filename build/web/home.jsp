@@ -1,4 +1,13 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="com.pahanaedu.model.User" %>
+<%
+    User loggedUser = (User) session.getAttribute("loggedUser");
+    if (loggedUser == null) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+    String role = loggedUser.getRole();
+%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -53,11 +62,16 @@
         <h2>📖 PahanaEdu</h2>
         <a href="dashboard.jsp" target="mainFrame">🏠 Dashboard</a>
         <a href="customers.jsp" target="mainFrame">👥 Customers</a>
-        <a href="addUser.jsp" target="mainFrame">🧑‍💼 Users</a>
+
+        <% if ("admin".equals(role)) { %>
+            <a href="addUser.jsp" target="mainFrame">🧑‍💼 Users</a>
+            <a href="salesReport.jsp" target="mainFrame">📊 Sales Report</a>
+        <% } %>
+
         <a href="manageItems.jsp" target="mainFrame">📚 Books</a>
         <a href="sales.jsp" target="mainFrame">💰 Sales</a>
         <a href="help.jsp" target="mainFrame">❓ Help</a>
-        <a href="login.jsp">🚪 Logout</a>
+        <a href="logout" target="_top">🚪 Logout</a>
     </div>
 
     <div class="main-content">
