@@ -22,14 +22,12 @@ public class UpdateCustomer extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        
         String accountNumber = request.getParameter("accountNumber");
         String name = request.getParameter("name");
         String address = request.getParameter("address");
         String telephone = request.getParameter("telephone");
         String email = request.getParameter("email");
 
-        
         if (accountNumber == null || accountNumber.trim().isEmpty()
                 || name == null || name.trim().isEmpty()
                 || address == null || address.trim().isEmpty()
@@ -50,12 +48,9 @@ public class UpdateCustomer extends HttpServlet {
             boolean updated = customerDAO.updateCustomer(updatedCustomer);
 
             if (updated) {
-              
                 HttpSession session = request.getSession();
                 session.setAttribute("message", "✅ Customer updated successfully.");
                 session.setAttribute("msgType", "success");
-
-               
                 response.sendRedirect("customers.jsp");
             } else {
                 request.setAttribute("message", "❌ Failed to update customer.");

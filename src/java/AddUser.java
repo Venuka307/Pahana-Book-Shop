@@ -25,7 +25,7 @@ public class AddUser extends HttpServlet {
         System.out.println("Password: " + password);
         System.out.println("Role: " + role);
 
-        // Basic validation
+        
         if(username.isEmpty() || password.isEmpty() || role == null || role.isEmpty()) {
             System.out.println("Validation failed: some fields are empty");
             request.setAttribute("message", "All fields are required!");
@@ -36,7 +36,7 @@ public class AddUser extends HttpServlet {
 
         UserDAO userDAO = DAOFactory.getUserDAO();
 
-        // Check if username exists in DB
+     
         boolean exists = userDAO.isUsernameExists(username);
         System.out.println("Does username exist? " + exists);
         if(exists) {
@@ -46,7 +46,7 @@ public class AddUser extends HttpServlet {
             return;
         }
 
-        // Add user to DB
+     
         boolean added = userDAO.addUser(username, password, role);
         System.out.println("User added? " + added);
 

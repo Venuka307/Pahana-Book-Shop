@@ -6,13 +6,11 @@ import com.pahanaedu.model.Customer;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
-
 import java.io.IOException;
 
 @WebServlet("/AddCustomer")
 public class AddCustomer extends HttpServlet {
     private static final long serialVersionUID = 1L;
-
     private CustomerDAO customerDAO;
 
     @Override
@@ -20,22 +18,22 @@ public class AddCustomer extends HttpServlet {
         customerDAO = new CustomerDAO();
     }
 
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String accountNumber = request.getParameter("accountNumber").trim();
-        String name = request.getParameter("name").trim();
-        String address = request.getParameter("address").trim();
-        String telephone = request.getParameter("telephone").trim();
-        String email = request.getParameter("email").trim();
-        
-        System.out.println("🚀 Received from form:");
-        System.out.println("Account Number: " + accountNumber);
-        System.out.println("Name: " + name);
-        System.out.println("Address: " + address);
-        System.out.println("Telephone: " + telephone);
-        System.out.println("Email: " + email);
+        String accountNumber = request.getParameter("account_number");
+        String name = request.getParameter("name");
+        String address = request.getParameter("address");
+        String telephone = request.getParameter("telephone");
+        String email = request.getParameter("email");
 
+        // basic null-safe trimming
+        accountNumber = accountNumber != null ? accountNumber.trim() : "";
+        name = name != null ? name.trim() : "";
+        address = address != null ? address.trim() : "";
+        telephone = telephone != null ? telephone.trim() : "";
+        email = email != null ? email.trim() : "";
 
         if (accountNumber.isEmpty() || name.isEmpty() || address.isEmpty() || telephone.isEmpty() || email.isEmpty()) {
             request.setAttribute("message", "❌ All fields are required.");
@@ -44,20 +42,27 @@ public class AddCustomer extends HttpServlet {
             return;
         }
 
-        Customer customer = new Customer(accountNumber, name, address, telephone, email);
-
-        boolean success = customerDAO.addCustomer(customer);
-        
-        System.out.println("✅ DAO returned: " + success); 
-
-        if (success) {
-            request.setAttribute("message", "✅ Customer added successfully!");
-            request.setAttribute("msgType", "success");
-        } else {
-            request.setAttribute("message", "❌ Failed to add customer. Maybe duplicate account number.");
+        // Check if account number already exists to avoid duplicates
+        Customer existing = customerDAO.getCustomerByAccountNumber(accountNumber);
+        if (existing != null) {
+            request.setAttribute("message", "❌ Account Number already exists! Please use a unique account number.");
             request.setAttribute("msgType", "error");
+            request.getRequestDispatcher("addCustomer.jsp").forward(request, response);
+            return;
         }
 
-        request.getRequestDispatcher("addCustomer.jsp").forward(request, response);
+        Customer customer = new Customer(accountNumber, name, address, telephone, email);
+        boolean success = customerDAO.addCustomer(customer);
+
+        if (success) {
+            HttpSession session = request.getSession();
+            session.setAttribute("message", "✅ Customer added successfully!");
+            session.setAttribute("msgType", "success");
+            response.sendRedirect("customers.jsp");
+        } else {
+            request.setAttribute("message", "❌ Failed to add customer.");
+            request.setAttribute("msgType", "error");
+            request.getRequestDispatcher("addCustomer.jsp").forward(request, response);
+        }
     }
 }

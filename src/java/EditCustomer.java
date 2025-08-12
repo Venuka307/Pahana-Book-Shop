@@ -23,22 +23,21 @@ public class EditCustomer extends HttpServlet {
         String accountNumber = request.getParameter("accountNumber");
 
         if (accountNumber == null || accountNumber.trim().isEmpty()) {
-            response.sendRedirect("customer.jsp");  
+            response.sendRedirect("customers.jsp");  
             return;
         }
 
         Customer customer = customerDAO.getCustomerByAccountNumber(accountNumber);
 
         if (customer == null) {
-            request.setAttribute("message", "❌ Customer not found.");
-            request.getRequestDispatcher("customer.jsp").forward(request, response);
+            HttpSession session = request.getSession();
+            session.setAttribute("message", "❌ Customer not found.");
+            session.setAttribute("msgType", "error");
+            response.sendRedirect("customers.jsp");
             return;
         }
 
-        
         request.setAttribute("editCustomer", customer);
-
-        
         request.getRequestDispatcher("addCustomer.jsp").forward(request, response);
     }
 }

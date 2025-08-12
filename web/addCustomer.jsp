@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" session="true" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" session="true" %> 
 <%@ page import="com.pahanaedu.model.Customer" %>
 
 <%
@@ -9,111 +9,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title><%= isEditing ? "Edit" : "Add" %> Customer - Pahana Edu</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
     <style>
-        body {
-            margin: 0;
-            font-family: 'Poppins', sans-serif;
-            background: #f5f7fa;
-            color: #333;
-        }
-        .container {
-            max-width: 900px;
-            margin: 40px auto;
-            background: white;
-            padding: 30px 40px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        h1 {
-            text-align: center;
-            color: #2c3e50;
-            margin-bottom: 30px;
-            font-weight: 600;
-        }
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 18px;
-        }
-        label {
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: #34495e;
-        }
-        input[type=text], input[type=tel], input[type=email] {
-            padding: 10px 12px;
-            border: 1.8px solid #bdc3c7;
-            border-radius: 6px;
-            font-size: 16px;
-            transition: border-color 0.3s ease;
-        }
-        input[type=text]:focus, input[type=tel]:focus, input[type=email]:focus {
-            border-color: #2980b9;
-            outline: none;
-        }
-        button {
-            background-color: #2980b9;
-            color: white;
-            font-weight: 700;
-            border: none;
-            padding: 14px 0;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 18px;
-            transition: background-color 0.3s ease;
-        }
-        button:hover {
-            background-color: #1c5980;
-        }
-        .back-button {
-            background-color: #95a5a6;
-            margin-top: 10px;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 16px;
-            border-radius: 6px;
-            padding: 12px 0;
-            color: white;
-        }
-        .back-button:hover {
-            background-color: #7f8c8d;
-        }
-        .message {
-            text-align: center;
-            padding: 12px;
-            border-radius: 6px;
-            margin-top: 20px;
-        }
-        .success {
-            background-color: #dff0d8;
-            color: #3c763d;
-        }
-        .error {
-            background-color: #f2dede;
-            color: #a94442;
-        }
+        body { font-family: Arial, sans-serif; background:#f5f7fa; margin:20px; }
+        .container { max-width:700px; margin:0 auto; background:#fff; padding:22px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.06); }
+        h1 { margin-top:0; }
+        label { display:block; margin-top:10px; font-weight:600; }
+        input[type=text], input[type=tel], input[type=email] { width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; box-sizing:border-box; }
+        .btn { background:#2980b9; color:#fff; border:none; padding:10px 14px; border-radius:6px; cursor:pointer; margin-top:14px; }
+        .back { background:#95a5a6; color:#fff; border:none; padding:10px 12px; border-radius:6px; margin-left:8px; cursor:pointer; }
+        .message { margin-top:12px; padding:10px; border-radius:6px; }
+        .message.error { background:#f2dede; color:#8a1f1f; }
     </style>
-    <script>
-        function showCustomerTable() {
-    parent.showCustomerTable();
-}
-
-    </script>
 </head>
 <body>
-
 <div class="container">
     <h1><%= isEditing ? "✏️ Edit Customer" : "➕ Add New Customer" %></h1>
 
-    <form action="<%= request.getContextPath() + (isEditing ? "/UpdateCustomer" : "/AddCustomer") %>" method="post">
-
-
+    <form action="${pageContext.request.contextPath}/AddCustomer" method="post">
         <label for="accountNumber">Account Number</label>
-        <input type="text" id="accountNumber" name="accountNumber"
+        <input type="text" id="accountNumber" name="account_number"
                value="<%= isEditing ? editCustomer.getAccountNumber() : "" %>"
                placeholder="e.g. ACC123"
                <%= isEditing ? "readonly" : "required" %> />
@@ -138,8 +54,10 @@
                value="<%= isEditing ? editCustomer.getEmail() : "" %>"
                placeholder="email@example.com" required />
 
-        <button type="submit"><%= isEditing ? "Update Customer" : "Add Customer" %></button>
-        <button type="button" class="back-button" onclick="showCustomerTable()">⬅ Back to List</button>
+        <div>
+            <button type="submit" class="btn"><%= isEditing ? "Update Customer" : "Add Customer" %></button>
+            <button type="button" class="back" onclick="window.location='customers.jsp'">⬅ Back to List</button>
+        </div>
     </form>
 
     <%
@@ -147,17 +65,12 @@
         String msgType = (String) request.getAttribute("msgType");
         if (message != null && !message.trim().isEmpty()) {
     %>
-        <div class="message <%= msgType != null ? msgType : "" %>">
+        <div class="message <%= ("error".equals(msgType) ? "error" : "") %>">
             <%= message %>
         </div>
     <%
         }
     %>
 </div>
-
 </body>
 </html>
-
-
-
-

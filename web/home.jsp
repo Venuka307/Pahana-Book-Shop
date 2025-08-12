@@ -64,7 +64,7 @@
         <a href="customers.jsp" target="mainFrame">👥 Customers</a>
 
         <% if ("admin".equals(role)) { %>
-            <a href="addUser.jsp" target="mainFrame">🧑‍💼 Users</a>
+            <a href="users.jsp" target="mainFrame">🧑‍💼 Users</a>
             <a href="salesReport.jsp" target="mainFrame">📊 Sales Report</a>
         <% } %>
 

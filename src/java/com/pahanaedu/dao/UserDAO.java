@@ -72,7 +72,6 @@ public class UserDAO {
         }
     }
 
-    // New method: get all users
     public List<User> getAllUsers() {
         List<User> userList = new ArrayList<>();
         String sql = "SELECT * FROM users";
@@ -97,7 +96,62 @@ public class UserDAO {
         return userList;
     }
 
-    // New method: update user
+    // Add this searchUsers method:
+    public List<User> searchUsers(String keyword) {
+        List<User> userList = new ArrayList<>();
+        String sql = "SELECT * FROM users WHERE username LIKE ? OR role LIKE ?";
+
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            String searchPattern = "%" + keyword + "%";
+            stmt.setString(1, searchPattern);
+            stmt.setString(2, searchPattern);
+
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                User user = new User(
+                    rs.getInt("id"),
+                    rs.getString("username"),
+                    rs.getString("password"),
+                    rs.getString("role")
+                );
+                userList.add(user);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return userList;
+    }
+
+    // Added method: get user by id
+    public User getUserById(int id) {
+        User user = null;
+        String sql = "SELECT * FROM users WHERE id = ?";
+
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                user = new User(
+                    rs.getInt("id"),
+                    rs.getString("username"),
+                    rs.getString("password"),
+                    rs.getString("role")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return user;
+    }
+
     public boolean updateUser(User user) {
         String sql = "UPDATE users SET username = ?, password = ?, role = ? WHERE id = ?";
         try (Connection conn = DBConnection.getInstance().getConnection();
@@ -117,7 +171,6 @@ public class UserDAO {
         }
     }
 
-    // New method: delete user
     public boolean deleteUser(int id) {
         String sql = "DELETE FROM users WHERE id = ?";
         try (Connection conn = DBConnection.getInstance().getConnection();

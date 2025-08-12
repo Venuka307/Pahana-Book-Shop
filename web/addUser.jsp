@@ -1,11 +1,21 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" session="true" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" session="true" %> 
+<%@ page import="com.pahanaedu.model.User" %>
+<%@ page import="jakarta.servlet.http.HttpServletRequest" %>
+<%
+    User editUser = (User) request.getAttribute("editUser");
+    boolean isEdit = (editUser != null);
+
+    HttpServletRequest req = (HttpServletRequest) request;
+    String actionUrl = req.getContextPath() + "/" + (isEdit ? "UpdateUser" : "AddUser");
+%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Add User - Pahana Edu</title>
+    <title><%= isEdit ? "Edit User - Pahana Edu" : "Add User - Pahana Edu" %></title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet" />
     <style>
+        /* Your existing CSS here */
         body {
             margin: 0;
             font-family: 'Poppins', sans-serif;
@@ -79,23 +89,43 @@
 <body>
 
 <div class="container">
-    <h1>👤 Add New User</h1>
-    <form action="${pageContext.request.contextPath}/AddUser" method="post">
+    <h1><%= isEdit ? "✏️ Edit User" : "👤 Add New User" %></h1>
+    <form action="<%= actionUrl %>" method="post">
+
+        <% if (isEdit) { %>
+            <input type="hidden" name="id" value="<%= editUser.getId() %>" />
+        <% } %>
 
         <label for="username">Username</label>
-        <input type="text" id="username" name="username" placeholder="Enter username" required pattern="[A-Za-z0-9_]{4,20}" title="4 to 20 characters, letters, numbers or underscore">
+        <input 
+            type="text" 
+            id="username" 
+            name="username" 
+            placeholder="Enter username" 
+            required 
+            pattern="[A-Za-z0-9_]{4,20}" 
+            title="4 to 20 characters, letters, numbers or underscore"
+            value="<%= isEdit ? editUser.getUsername() : "" %>"
+            <%= isEdit ? "readonly" : "" %>
+        >
 
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" placeholder="Enter password" required minlength="4" />
+        <label for="password"><%= isEdit ? "New Password (leave blank to keep current)" : "Password" %></label>
+        <input 
+            type="password" 
+            id="password" 
+            name="password" 
+            placeholder="<%= isEdit ? "Enter new password or leave blank" : "Enter password" %>" 
+            <%= isEdit ? "" : "required minlength=\"4\"" %> 
+        />
 
         <label for="role">Role</label>
         <select id="role" name="role" required>
-            <option value="" disabled selected>Select user role</option>
-            <option value="admin">Admin</option>
-            <option value="staff">Staff</option>
+            <option value="" disabled <%= !isEdit ? "selected" : "" %>>Select user role</option>
+            <option value="admin" <%= isEdit && "admin".equals(editUser.getRole()) ? "selected" : "" %>>Admin</option>
+            <option value="staff" <%= isEdit && "staff".equals(editUser.getRole()) ? "selected" : "" %>>Staff</option>
         </select>
 
-        <button type="submit">Add User</button>
+        <button type="submit"><%= isEdit ? "Update User" : "Add User" %></button>
     </form>
 
     <% 
