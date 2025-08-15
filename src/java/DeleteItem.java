@@ -51,7 +51,7 @@ public class DeleteItem extends HttpServlet {
             }
         }
 
-        // Redirect to manageItem.jsp to avoid resubmission on page refresh
+       
         response.sendRedirect(request.getContextPath() + "/manageItem.jsp");
     }
 }

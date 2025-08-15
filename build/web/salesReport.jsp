@@ -3,14 +3,14 @@
 <%@ page import="com.pahanaedu.model.Sale" %>
 
 <%
-    List<Sale> salesList = (List<Sale>) request.getAttribute("salesList");
+    List<Sale> reportList = (List<Sale>) request.getAttribute("reportList");
 %>
 
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Sales - Pahana Edu</title>
+    <title>Sales Report - Pahana Edu</title>
     <style>
         table { border-collapse: collapse; width: 100%; }
         th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
@@ -19,7 +19,7 @@
 </head>
 <body>
 
-<h2>Sales List</h2>
+<h2>Sales Report</h2>
 
 <table>
     <thead>
@@ -34,8 +34,8 @@
     </thead>
     <tbody>
     <%
-        if (salesList != null && !salesList.isEmpty()) {
-            for (Sale sale : salesList) {
+        if (reportList != null && !reportList.isEmpty()) {
+            for (Sale sale : reportList) {
     %>
         <tr>
             <td><%= sale.getId() %></td>
@@ -50,7 +50,7 @@
         } else {
     %>
         <tr>
-            <td colspan="6">No sales found.</td>
+            <td colspan="6">No data found.</td>
         </tr>
     <%
         }

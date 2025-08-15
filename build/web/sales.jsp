@@ -1,81 +1,62 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.util.List" %>
+<%@ page import="com.pahanaedu.model.Sale" %>
+
+<%
+    List<Sale> salesList = (List<Sale>) request.getAttribute("salesList");
+%>
+
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <title>🧾 New Sale - Pahana Edu</title>
-  <style>
-    body {
-      font-family: 'Georgia', serif;
-      background: linear-gradient(to right, #f5f1ea, #d0c7b5);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-
-    .form-box {
-      background: #fff8ef;
-      padding: 40px;
-      border-radius: 12px;
-      width: 400px;
-      box-shadow: 0 0 12px rgba(0, 0, 0, 0.15);
-    }
-
-    h2 {
-      text-align: center;
-      margin-bottom: 30px;
-      color: #4b3c2b;
-    }
-
-    label {
-      font-weight: bold;
-      color: #5a4838;
-    }
-
-    input {
-      width: 100%;
-      padding: 10px;
-      margin-top: 6px;
-      margin-bottom: 16px;
-      border-radius: 6px;
-      border: 1px solid #c8b6a6;
-    }
-
-    button {
-      width: 100%;
-      background: #8b5e3c;
-      color: white;
-      border: none;
-      padding: 12px;
-      font-size: 16px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #6d4c2b;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Sales - Pahana Edu</title>
+    <style>
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background: #f4f4f4; }
+    </style>
 </head>
 <body>
-<div class="form-box">
-  <h2>🧾 New Sale</h2>
-  <form action="Sales" method="POST">
-    <label>📇 Customer Account Number</label>
-    <input type="text" name="accountNumber" required />
 
-    <label>📘 Item Name</label>
-    <input type="text" name="itemName" required />
+<h2>Sales List</h2>
 
-    <label>🔢 Quantity</label>
-    <input type="number" name="quantity" required />
+<table>
+    <thead>
+        <tr>
+            <th>Sale ID</th>
+            <th>Customer</th>
+            <th>Book</th>
+            <th>Quantity</th>
+            <th>Total</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+    <tbody>
+    <%
+        if (salesList != null && !salesList.isEmpty()) {
+            for (Sale sale : salesList) {
+    %>
+        <tr>
+            <td><%= sale.getId() %></td>
+            <td><%= sale.getCustomerName() %></td>
+            <td><%= sale.getBookTitle() %></td>
+            <td><%= sale.getQuantity() %></td>
+            <td><%= sale.getTotal() %></td>
+            <td><%= sale.getDate() %></td>
+        </tr>
+    <%
+            }
+        } else {
+    %>
+        <tr>
+            <td colspan="6">No sales found.</td>
+        </tr>
+    <%
+        }
+    %>
+    </tbody>
+</table>
 
-    <label>💰 Unit Price (Rs.)</label>
-    <input type="number" name="unitPrice" required />
-
-    <button type="submit">🧾 Generate Bill</button>
-  </form>
-</div>
 </body>
 </html>

@@ -16,6 +16,12 @@ public class Login extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        // Invalidate old session first (ensures fresh login)
+        HttpSession oldSession = request.getSession(false);
+        if (oldSession != null) {
+            oldSession.invalidate();
+        }
+
         String username = request.getParameter("username");
         String password = request.getParameter("password");
 
@@ -23,11 +29,13 @@ public class Login extends HttpServlet {
         User user = userDAO.login(username, password);
 
         if (user != null) {
-            HttpSession session = request.getSession();
-            session.setAttribute("loggedUser", user);  
-            response.sendRedirect("home.jsp");
+            // Always create a new session for the logged-in user
+            HttpSession session = request.getSession(true);
+            session.setAttribute("loggedUser", user);
+            response.sendRedirect("home.jsp"); // Successful login → go to dashboard
         } else {
-            request.setAttribute("error", "Invalid username or password");
+            // Invalid login → forward to login.jsp with alert
+            request.setAttribute("error", "❌ Invalid username or password");
             request.getRequestDispatcher("login.jsp").forward(request, response);
         }
     }

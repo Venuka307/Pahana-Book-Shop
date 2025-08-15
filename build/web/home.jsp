@@ -71,7 +71,7 @@
         <a href="manageItems.jsp" target="mainFrame">📚 Books</a>
         <a href="sales.jsp" target="mainFrame">💰 Sales</a>
         <a href="help.jsp" target="mainFrame">❓ Help</a>
-        <a href="logout" target="_top">🚪 Logout</a>
+        <a href="Logout" target="_top">🚪 Logout</a>
     </div>
 
     <div class="main-content">

@@ -28,7 +28,7 @@ public class AddCustomer extends HttpServlet {
         String telephone = request.getParameter("telephone");
         String email = request.getParameter("email");
 
-        // basic null-safe trimming
+        
         accountNumber = accountNumber != null ? accountNumber.trim() : "";
         name = name != null ? name.trim() : "";
         address = address != null ? address.trim() : "";
@@ -42,7 +42,7 @@ public class AddCustomer extends HttpServlet {
             return;
         }
 
-        // Check if account number already exists to avoid duplicates
+        
         Customer existing = customerDAO.getCustomerByAccountNumber(accountNumber);
         if (existing != null) {
             request.setAttribute("message", "❌ Account Number already exists! Please use a unique account number.");
