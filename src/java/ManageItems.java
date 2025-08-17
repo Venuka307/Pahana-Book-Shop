@@ -1,82 +1,58 @@
 package com.pahanaedu.servlet;
 
+import com.pahanaedu.dao.ItemDAO;
 import com.pahanaedu.model.Item;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet("/ManageItems")
 public class ManageItems extends HttpServlet {
 
-    @SuppressWarnings("unchecked")
-    private List<Item> getItemsFromSession(HttpSession session) {
-        Object obj = session.getAttribute("items");
-        if (obj instanceof List<?>) {
-            return (List<Item>) obj;
-        }
-        return new ArrayList<>();
+    private ItemDAO itemDAO;
+
+    @Override
+    public void init() {
+        itemDAO = new ItemDAO(); 
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        HttpSession session = request.getSession();
-        List<Item> items = getItemsFromSession(session);
-
-        if (items.isEmpty()) {
-            items.add(new Item(1, "Book A", 250.0, 10));
-            items.add(new Item(2, "Book B", 320.0, 5));
-            items.add(new Item(3, "Book C", 180.0, 7));
-            session.setAttribute("items", items);
-        }
-
+       
+        List<Item> items = itemDAO.getAllItems();
         request.setAttribute("items", items);
-        request.getRequestDispatcher("manageItems.jsp").forward(request, response);
+        request.getRequestDispatcher("/manageItems.jsp").forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        HttpSession session = request.getSession();
-        List<Item> items = getItemsFromSession(session);
+        String action = request.getParameter("actionType"); // add, edit, delete
+        String name = request.getParameter("itemName");
+        String priceStr = request.getParameter("itemPrice");
+        String qtyStr = request.getParameter("itemQuantity");
 
-        String action = request.getParameter("action");
+        double price = priceStr != null && !priceStr.isEmpty() ? Double.parseDouble(priceStr) : 0;
+        int quantity = qtyStr != null && !qtyStr.isEmpty() ? Integer.parseInt(qtyStr) : 0;
 
-        switch (action) {
-            case "add" -> {
-                int id = items.size() > 0 ? items.get(items.size() - 1).getId() + 1 : 1;
-                String name = request.getParameter("name");
-                double price = Double.parseDouble(request.getParameter("price"));
-                int qty = Integer.parseInt(request.getParameter("quantity"));
-                items.add(new Item(id, name, price, qty));
-                session.setAttribute("message", "✅ Item added successfully!");
-            }
-            case "edit" -> {
-                int editId = Integer.parseInt(request.getParameter("id"));
-                for (Item i : items) {
-                    if (i.getId() == editId) {
-                        i.setName(request.getParameter("name"));
-                        i.setPrice(Double.parseDouble(request.getParameter("price")));
-                        i.setQuantity(Integer.parseInt(request.getParameter("quantity")));
-                        break;
-                    }
-                }
-                session.setAttribute("message", "✏️ Item updated successfully!");
-            }
-            case "delete" -> {
-                int deleteId = Integer.parseInt(request.getParameter("id"));
-                items.removeIf(item -> item.getId() == deleteId);
-                session.setAttribute("message", "🗑️ Item deleted successfully!");
-            }
+        if ("add".equals(action)) {
+            Item item = new Item(0, name, price, quantity);
+            itemDAO.addItem(item);
+        } else if ("edit".equals(action)) {
+            int id = Integer.parseInt(request.getParameter("itemId"));
+            Item item = new Item(id, name, price, quantity);
+            itemDAO.updateItem(item);
+        } else if ("delete".equals(action)) {
+            int id = Integer.parseInt(request.getParameter("itemId"));
+            itemDAO.deleteItem(id);
         }
 
-        session.setAttribute("items", items);
+        
         response.sendRedirect("ManageItems");
     }
 }
