@@ -1,168 +1,162 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="com.pahanaedu.model.User" %>
-<%
-    User loggedUser = (User) session.getAttribute("loggedUser");
-    if (loggedUser == null) {
-        response.sendRedirect("login.jsp");
-        return;
-    }
-%>
+<%@ page contentType="text/html; charset=UTF-8" language="java" %>
+<%@ page pageEncoding="UTF-8" %>
 <!DOCTYPE html>
 <html>
 <head>
-    <title>💰 POS - Sales</title>
-    <style>
-        body { font-family: "Segoe UI", sans-serif; background-color: #f5f6fa; margin:0; padding:20px;}
-        h2, h3 { color:#1a237e; }
-        input, select, button { padding:5px; margin:5px; }
-        table { width:100%; border-collapse: collapse; margin-top:10px; }
-        th, td { border:1px solid #ccc; padding:8px; text-align:center; }
-        th { background-color:#1a237e; color:white; }
-        button { cursor:pointer; }
-    </style>
+<meta charset="UTF-8">
+<title>Pahana Edu - POS System</title>
+<style>
+body { font-family: Arial, sans-serif; background:#f5f7fa; color:#333; margin:20px; }
+.container { display:flex; max-width:1200px; margin:0 auto; gap:15px; }
+
+
+.cart { width:35%; background:white; padding:15px; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.05); }
+.cart h2 { text-align:center; margin-bottom:10px; color:#2980b9; }
+table { width:100%; border-collapse: collapse; margin-top:12px; }
+th, td { padding:10px 12px; text-align:center; border-bottom:1px solid #eee; }
+th { background-color:#2980b9; color:white; }
+.cart-footer { margin-top:10px; text-align:right; font-weight:bold; color:#2980b9; }
+
+
+.products { flex:1; display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; }
+.btn { padding:12px; background:#2980b9; color:white; font-weight:bold; border:none; border-radius:6px; cursor:pointer; text-align:center; transition:0.2s; }
+.btn:hover { background:#3498db; }
+
+
+.sidebar { width:15%; display:flex; flex-direction:column; gap:10px; }
+.pay { background:#27ae60; color:white; }
+.pay:hover { background:#2ecc71; }
+.print { background:#16a085; color:white; }
+.clear { background:#c0392b; color:white; }
+
+
+#receipt {
+    display:none; width:280px; padding:10px; margin:20px auto;
+    background:#fff; color:#000; font-family:monospace; font-size:12px;
+    border:1px solid #000; border-radius:5px; line-height:1.4;
+}
+#receipt h2 { text-align:center; margin:5px 0; }
+#receipt pre { white-space: pre-wrap; word-wrap: break-word; }
+
+@media print {
+    body * { visibility:hidden; }
+    #receipt, #receipt * { visibility:visible; }
+    #receipt { position:absolute; left:0; top:0; width:auto; }
+}
+</style>
 </head>
 <body>
-<h2>💰 POS - Sales</h2>
+
+<div class="container">
+    <!-- CART AREA -->
+    <div class="cart">
+        <h2>&#x1F4CB; Bookshop Cart</h2>
+        <table>
+            <thead>
+                <tr><th>Book</th><th>Qty</th><th>Price</th><th>Total</th></tr>
+            </thead>
+            <tbody id="cartBody"></tbody>
+        </table>
+        <div class="cart-footer">Grand Total: Rs. <span id="grandTotal">0.00</span></div>
+    </div>
+
+    
+    <div class="products">
+        <button class="btn" onclick="addToCart('Harry Potter', 1200)">Harry Potter<br/>Rs.1200</button>
+        <button class="btn" onclick="addToCart('Math Grade 10', 950)">Math Grade 10<br/>Rs.950</button>
+        <button class="btn" onclick="addToCart('Pen', 50)">Pen<br/>Rs.50</button>
+        <button class="btn" onclick="addToCart('Notebook', 200)">Notebook<br/>Rs.200</button>
+        <button class="btn" onclick="addToCart('Story Book', 500)">Story Book<br/>Rs.500</button>
+        <button class="btn" onclick="addToCart('Science Grade 11', 1100)">Science Grade 11<br/>Rs.1100</button>
+        <button class="btn" onclick="addToCart('Lord of the Rings', 1500)">Lord of the Rings<br/>Rs.1500</button>
+        <button class="btn" onclick="addToCart('Pencil', 30)">Pencil<br/>Rs.30</button>
+        <button class="btn" onclick="addToCart('Coloring Book', 400)">Coloring Book<br/>Rs.400</button>
+        <button class="btn" onclick="addToCart('History Grade 12', 900)">History Grade 12<br/>Rs.900</button>
+        <button class="btn" onclick="addToCart('C++ Programming', 1250)">C++ Programming<br/>Rs.1250</button>
+        <button class="btn" onclick="addToCart('Java for Beginners', 1350)">Java for Beginners<br/>Rs.1350</button>
+        <button class="btn" onclick="addToCart('Python Cookbook', 1400)">Python Cookbook<br/>Rs.1400</button>
+        <button class="btn" onclick="addToCart('English Grammar', 800)">English Grammar<br/>Rs.800</button>
+        <button class="btn" onclick="addToCart('Sri Lanka History', 950)">Sri Lanka History<br/>Rs.950</button>
+    </div>
+
+    <!-- SIDEBAR ACTIONS -->
+    <div class="sidebar">
+        <button class="btn pay" onclick="payCart()">💳 Pay</button>
+        <button class="btn print" onclick="printReceipt()">🖨 Print Receipt</button>
+        <button class="btn clear" onclick="clearCart()">❌ Clear</button>
+    </div>
+</div>
 
 
-<h3>Select Book</h3>
-<select id="bookSelect">
-    <option value="">-- Select Book --</option>
-    <option value="Book A|500">Book A - Rs.500</option>
-    <option value="Book B|650">Book B - Rs.650</option>
-    <option value="Book C|300">Book C - Rs.300</option>
-</select>
-<input type="number" id="qty" placeholder="Quantity" min="1" value="1">
-<button onclick="addToCart()">Add to Cart</button>
-
-
-<h3>Add New Book</h3>
-<input type="text" id="newBookName" placeholder="Book Name">
-<input type="number" id="newBookPrice" placeholder="Price" min="1">
-<input type="number" id="newBookQty" placeholder="Quantity" min="1" value="1">
-<button onclick="addNewBook()">Add Book</button>
-
-
-<h3>Cart</h3>
-<table id="cartTable">
-    <thead>
-        <tr>
-            <th>Book Name</th>
-            <th>Price (Rs.)</th>
-            <th>Quantity</th>
-            <th>Total (Rs.)</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-    <tbody></tbody>
-</table>
-
-<!-- Pay Button -->
-<button onclick="pay()">💳 Pay</button>
+<div id="receipt">
+    <h2>&#x1F4DA; Pahana Edu</h2>
+    <pre id="receiptContent"></pre>
+</div>
 
 <script>
-let cart = [];
+document.addEventListener("DOMContentLoaded", function() {
+    let cart = [];
 
-// Add from dropdown
-function addToCart() {
-    let sel = document.getElementById('bookSelect');
-    let value = sel.value.trim();
-
-    if(!value) { alert('Select a book!'); return; }
-
-    let parts = value.split('|');
-    if(parts.length !== 2) { alert('Invalid book format'); return; }
-
-    let name = parts[0].trim();
-    let price = parseFloat(parts[1].trim());
-    let qty = parseInt(document.getElementById('qty').value);
-
-    if(isNaN(qty) || qty < 1) { alert('Enter valid quantity'); return; }
-
-    let existing = cart.find(item => item.name === name);
-    if(existing){ existing.qty += qty; } 
-    else { cart.push({name: name, price: price, qty: qty}); }
-
-    renderCart();
-}
-
-// Add new book manually
-function addNewBook() {
-    let name = document.getElementById('newBookName').value.trim();
-    let price = parseFloat(document.getElementById('newBookPrice').value);
-    let qty = parseInt(document.getElementById('newBookQty').value);
-
-    if(!name || isNaN(price) || price <= 0 || isNaN(qty) || qty < 1){
-        alert("Enter valid book details!");
-        return;
+    function addToCart(name, price){
+        let existing = cart.find(i=>i.name===name);
+        if(existing){
+            existing.qty++;
+            existing.total = existing.qty * existing.price;
+        } else {
+            cart.push({name:name, qty:1, price:price, total:price});
+        }
+        renderCart();
     }
 
-    let existing = cart.find(item => item.name === name);
-    if(existing){ existing.qty += qty; } 
-    else { cart.push({name: name, price: price, qty: qty}); }
+    function renderCart(){
+        let tbody = document.getElementById("cartBody");
+        let receiptContent = document.getElementById("receiptContent");
+        tbody.innerHTML = "";
+        let grandTotal = 0;
+        let receiptText = "📖 PahanaEdu Bookshop\n";
+        receiptText += "----------------------------\n";
+        receiptText += "Item           Qty   Total\n";
+        receiptText += "----------------------------\n";
 
-    // Clear input fields
-    document.getElementById('newBookName').value = '';
-    document.getElementById('newBookPrice').value = '';
-    document.getElementById('newBookQty').value = 1;
+        cart.forEach(i=>{
+            grandTotal += i.total;
+            tbody.innerHTML += `<tr>
+                <td>${i.name}</td>
+                <td>${i.qty}</td>
+                <td>Rs.${i.price.toFixed(2)}</td>
+                <td>Rs.${i.total.toFixed(2)}</td>
+            </tr>`;
+            let name = i.name.length>12 ? i.name.substring(0,12) : i.name;
+            receiptText += name.padEnd(12,' ') + i.qty.toString().padStart(3,' ') + "  " + i.total.toFixed(2).toString().padStart(6,' ') + "\n";
+        });
 
-    renderCart();
-}
+        receiptText += "----------------------------\n";
+        receiptText += "GRAND TOTAL: Rs."+grandTotal.toFixed(2)+"\n";
+        receiptText += "Thank you for shopping!\n";
+        receiptText += "----------------------------\n";
 
-// Render cart table
-function renderCart() {
-    let tbody = document.querySelector('#cartTable tbody');
-    tbody.innerHTML = '';
-    cart.forEach((item,index) => {
-        let total = (item.price * item.qty).toFixed(2);
-        let tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>${item.name}</td>
-            <td>${item.price.toFixed(2)}</td>
-            <td>${item.qty}</td>
-            <td>${total}</td>
-            <td><button onclick="removeItem(${index})">❌ Remove</button></td>
-        `;
-        tbody.appendChild(tr);
-    });
-}
+        receiptContent.innerText = receiptText;
+        document.getElementById("grandTotal").innerText = grandTotal.toFixed(2);
+    }
 
-// Remove item
-function removeItem(index){
-    cart.splice(index,1);
-    renderCart();
-}
+    window.addToCart = addToCart;
 
-// Pay / Print receipt
-function pay() {
-    if(cart.length===0){ alert('Cart is empty!'); return; }
+    window.clearCart = function(){
+        cart=[];
+        renderCart();
+        document.getElementById("receipt").style.display="none";
+    }
 
-    let total=0;
-    let receipt = "📖 PahanaEdu Bookshop\n";
-    receipt += "----------------------------\n";
-    receipt += "Item           Qty   Price\n";
-    receipt += "----------------------------\n";
+    window.payCart = function(){
+        if(cart.length===0){ alert("Cart is empty!"); return; } 
+        document.getElementById("receipt").style.display="block";
+    }
 
-    cart.forEach(item=>{
-        let lineTotal = item.price * item.qty;
-        total += lineTotal;
-        let name = item.name.length>12 ? item.name.substring(0,12) : item.name;
-        receipt += name.padEnd(12,' ') + item.qty.toString().padStart(3,' ') + "  " + lineTotal.toFixed(2).toString().padStart(6,' ') + "\n";
-    });
-
-    receipt += "----------------------------\n";
-    receipt += "GRAND TOTAL: Rs. "+total.toFixed(2)+"\n";
-    receipt += "Thank you for shopping!\n";
-    receipt += "----------------------------\n";
-
-    let printWindow = window.open('','', 'height=400,width=400');
-    printWindow.document.write('<pre>'+receipt+'</pre>');
-    printWindow.document.write('<button onclick="window.print();">🖨️ Print</button>');
-    printWindow.document.close();
-
-    cart = [];
-    renderCart();
-}
+    window.printReceipt = function(){
+        if(cart.length===0){ alert("No items to print!"); return; }
+        window.print();
+    }
+});
 </script>
 </body>
 </html>

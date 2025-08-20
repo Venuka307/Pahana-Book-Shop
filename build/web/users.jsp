@@ -4,7 +4,7 @@
 <%@ page import="com.pahanaedu.model.User" %>
 
 <%
-    // ===== DUMMY DATA =====
+    
     List<User> users = new ArrayList<>();
     users.add(new User(1, "admin", "", "Admin"));
     users.add(new User(2, "john", "", "Staff"));
@@ -17,7 +17,7 @@
     users.add(new User(9, "olivia", "", "Staff"));
     users.add(new User(10, "noah", "", "Staff"));
 
-    // Optional: read session messages
+    
     String message = (String) session.getAttribute("message");
     String msgType = (String) session.getAttribute("msgType");
     if (message != null) {
@@ -80,7 +80,7 @@
             </form>
         </div>
 
-        <!-- Add User Button -->
+        
         <div>
             <a href="addUser.jsp"><button class="btn">➕ Add User</button></a>
         </div>

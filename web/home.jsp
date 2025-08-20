@@ -59,7 +59,7 @@
 
 <div class="container">
     <div class="sidebar">
-        <h2>📖 PahanaEdu</h2>
+        <h2>📖 Pahana Edu 📖</h2>
         <a href="dashboard.jsp" target="mainFrame">🏠 Dashboard</a>
         <a href="customers.jsp" target="mainFrame">👥 Customers</a>
 
